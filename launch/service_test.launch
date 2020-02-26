@@ -1,0 +1,16 @@
+
+<launch>
+
+
+
+	<node pkg="test_2_service" type="path_planning_01" name="path_planning_01" output="screen">
+	</node>
+	<node pkg="test_2_service" type="server_2" name="server_2" output="screen">
+	</node>
+	<node pkg="test_2_service" type="main" name="main" output="screen">
+	</node>
+
+
+
+
+</launch>
