@@ -2,13 +2,10 @@
 #include <iostream>
 #include "std_msgs/String.h"
 
-
-
 #include "test_2_service/path.h"
-
-
 #include "test_2_service/AddTwoInts.h"
 #include <cstdlib>
+
 
 int main(int argc, char **argv)
 {
@@ -30,15 +27,14 @@ int main(int argc, char **argv)
   srv.request.goal_pos_x = 45;
   srv.request.goal_pos_y = 30;
 
-  /*ros::ServiceClient client2 = n.serviceClient<test_2_service::AddTwoInts>("add_two_ints_2");
-  test_2_service::AddTwoInts srv2;
-  srv2.request.a = 7;
-  srv2.request.b = 3;*/
-
   while(ros::ok()){
     ROS_INFO("333 ");
+    double begin_time =ros::Time::now().toSec();
+
     if (client.call(srv))
     {
+    double clustering_time = ros::Time::now().toSec () - begin_time; 
+    ROS_INFO ("%f secs for path plan .", clustering_time);
     ROS_INFO("next_pos_x: %ld", (long int)srv.response.next_pos_x);
     ROS_INFO("next_pos_y: %ld", (long int)srv.response.next_pos_y);
     }
@@ -46,17 +42,7 @@ int main(int argc, char **argv)
     {
     ROS_ERROR("Failed to call service add_two_ints1");
     }
-    /*
-    if (client2.call(srv2))
-    {
-    ROS_INFO("Sum: %ld", (long int)srv2.response.sum);
-    }
-    else
-    {
-    ROS_ERROR("Failed to call service add_two_ints");
-    return 1;
-    }
-    */
+
     ros::spinOnce();
   }
   return 0;

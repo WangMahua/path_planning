@@ -1,0 +1,16 @@
+
+<launch>
+
+
+
+	<node pkg="test_2_service" type="talker1" name="talker1" output="screen">
+	</node>
+	<node pkg="test_2_service" type="talker2" name="talker2" output="screen">
+	</node>
+	<node pkg="test_2_service" type="agent_test" name="agent_test" output="screen">
+	</node>
+
+
+
+
+</launch>

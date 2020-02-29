@@ -57,6 +57,7 @@ add_message_files(
   st1_input.msg
   st2_input.msg
   path_planning.msg
+  string.msg 
 
 )
 
@@ -213,6 +214,7 @@ include_directories(
 add_executable(agent src/agent.cpp)
 target_link_libraries(agent ${catkin_LIBRARIES})
 
+
 add_executable(main src/main.cpp)
 target_link_libraries(main ${catkin_LIBRARIES})
 
@@ -221,3 +223,9 @@ target_link_libraries(path_planning_01 ${catkin_LIBRARIES})
 
 add_executable(server_2 src/server_2.cpp)
 target_link_libraries(server_2 ${catkin_LIBRARIES})
+
+add_executable(talker2 src/talker2.cpp)
+target_link_libraries(talker2 ${catkin_LIBRARIES})
+
+add_executable(talker1 src/talker1.cpp)
+target_link_libraries(talker1 ${catkin_LIBRARIES})

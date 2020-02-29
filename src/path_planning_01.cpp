@@ -1,16 +1,14 @@
 #include "ros/ros.h"
+#include "std_msgs/String.h"
+#include "test_2_service/path.h"
+#include "test_2_service/AddTwoInts.h"
+#include <cstdlib>
+
 #include <iostream>
 #include <queue>
 #include <vector>
 #include <cmath>
-#include <stack>
 
-#include "std_msgs/String.h"
-
-
-#include "test_2_service/path.h"
-#include "test_2_service/AddTwoInts.h"
-#include <cstdlib>
 
 using namespace std;
 
@@ -261,16 +259,71 @@ double HeuristicFunctionDiagnal(Node start, Node goal)
     return cost;
 }
 
+void PrintPath(vector<PosNode> p, int maze[mazeSizeX][mazeSizeY])
+{
+    cout << "path: ";
+    for(unsigned int i = 0; i < p.size(); i++)
+    {
+        cout << "(" << p[i].pos[0] << "," << p[i].pos[1] << ") ";
+        maze[p[i].pos[0]][p[i].pos[1]] = 8;  //print out path as 8
+
+    }
+    cout << "\n";
+}
+
+void PrintMaze(int start[2], int goal[2], int maze[mazeSizeX][mazeSizeY])      // print out maze
+{
+    cout << "\n";
+    maze[start[0]][start[1]] = 5;  //set maze start point as 5
+    maze[goal[0]][goal[1]] = 9;  //set maze goal point as 9
+    char cmaze[mazeSizeX][mazeSizeY];
+    //print out the maze
+    for(int j = 0; j < mazeSizeY; j++)
+    {
+        for(int i = 0; i < mazeSizeX; i++)
+        {
+            if(maze[i][j] == 0)
+            {
+                cmaze[i][j] = 'H';
+            }
+            else if(maze[i][j] == 8)
+            {
+                cmaze[i][j] = '#';
+            }
+            else if(maze[i][j] == 4)
+            {
+                cmaze[i][j] = '~';
+            }
+            else if(maze[i][j] == 1)
+            {
+                cmaze[i][j] = '.';
+            }
+            else if(maze[i][j] == 5)
+            {
+                cmaze[i][j] = 'S';
+            }
+            else if(maze[i][j] == 9)
+            {
+                cmaze[i][j] = 'G';
+            }
+            cout << cmaze[i][j];
+            cout << " ";
+        }
+        cout << "\n";
+    }
+}
+
+
 
 bool operator<(Node const& n1, Node const& n2)
 {
     /*if(n1.priority_stamp!=n2.priority_stamp){
         return n1.priority_stamp > n2.priority_stamp;
     }*/
-    if(n1.f!=n2.f){
-        return n1.f > n2.f;
+    if(abs(n1.f-n2.f)<0.000001){
+        return n1.priority_stamp > n2.priority_stamp;
     }
-    return n1.priority_stamp > n2.priority_stamp;
+    return n1.f > n2.f;
 }
 
 
@@ -289,13 +342,11 @@ vector<PosNode> AStar(int start_pos[2], int goal_pos[2], int maze[mazeSizeX][maz
         cout << "goal unreachable\n";
         return fail;
     }
-    
     if(start_pos[0]<0 || start_pos[0]>mazeSizeX-1 || start_pos[1]<0 || start_pos[1]>mazeSizeY-1 || goal_pos[0]<0 || goal_pos[0]>mazeSizeX-1 || goal_pos[1]<0 || goal_pos[1]>mazeSizeY-1)
     {
         cout << "invalid input\n";
         return fail;
     }
-    
     start.move_cost = 0;
     start.g = 0;
     start.h = HeuristicFunctionDiagnal(start, goal);
@@ -306,7 +357,18 @@ vector<PosNode> AStar(int start_pos[2], int goal_pos[2], int maze[mazeSizeX][maz
     while(!priority_q.empty())
     {
         Node top_node = priority_q.top();
-
+/*////////////////////////////////
+        cout << "priority queue:\n";
+        priority_queue<Node> a;
+        a = priority_q;
+        while(!a.empty()){
+            Node b = a.top();
+            cout << "pos: ("<<b.PosX() << "," << b.PosY() <<") f:" << b.f << " g: " << b.g << " timestamp: " << b.priority_stamp <<"\n" ;
+            a.pop();
+        }
+        cout << "========\n";
+////////////////////////////////////*/
+        //cout <<"top node: (" << top_node.PosX() <<","<< top_node.PosY()<<") f: " << top_node.f << "\n";
         PosNode pos;
         pos.pos[0] = top_node.PosX();
         pos.pos[1] = top_node.PosY();
@@ -343,7 +405,38 @@ vector<PosNode> AStar(int start_pos[2], int goal_pos[2], int maze[mazeSizeX][maz
     return fail;
 }
 
+/*double calculate_m(PosNode p1, PosNode p2)
+{
+    double m, num, den;
+    num = abs(p2.pos[1])-abs(p1.pos[1]);
+    den = abs(p2.pos[0])-abs(p1.pos[0]);
+    m = num/den;
+    return m;
+}
 
+vector<PosNode> path_simplifier(vector<PosNode> path)
+{
+    vector<PosNode> new_path;
+    PosNode looking_node = path[0];
+    double m = calculate_m(looking_node, path[1]);
+    new_path.push_back(looking_node);
+    new_path.push_back(path[1]);
+    for(unsigned int i = 2; i < path.size(); i++)
+    {
+        if(m == calculate_m(looking_node, path[i]))
+        {
+            new_path.pop_back();
+            new_path.push_back(path[i]);
+        }
+        else
+        {
+            new_path.push_back(path[i]);
+            looking_node = path[i-1];
+            m = calculate_m(looking_node, path[i]);
+        }
+    }
+    return new_path;
+}*/
 
 vector<PosNode> bresenhams_line_alg(vector<PosNode> new_path, int maze[mazeSizeX][mazeSizeY])
 {
@@ -416,8 +509,6 @@ vector<PosNode> bresenhams_line_alg(vector<PosNode> new_path, int maze[mazeSizeX
     return output;
 }
 
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
 int get_x(vector<PosNode> path){
     PosNode a = path.front();
     int x = a.pos[0];
@@ -430,59 +521,6 @@ int get_y(vector<PosNode> path){
     return y;
 }
 
-void PrintPath(vector<PosNode> p, int maze[mazeSizeX][mazeSizeY])
-{
-    cout << "path: ";
-    for(unsigned int i = 0; i < p.size(); i++)
-    {
-        cout << "(" << p[i].pos[0] << "," << p[i].pos[1] << ") ";
-        maze[p[i].pos[0]][p[i].pos[1]] = 8;  //print out path as 8
-
-    }
-    cout << "\n";
-}
-
-void PrintMaze(int start[2], int goal[2], int maze[mazeSizeX][mazeSizeY])      // print out maze
-{
-    cout << "\n";
-    maze[start[0]][start[1]] = 5;  //set maze start point as 5
-    maze[goal[0]][goal[1]] = 9;  //set maze goal point as 9
-    char cmaze[mazeSizeX][mazeSizeY];
-    //print out the maze
-    for(int j = 0; j < mazeSizeY; j++)
-    {
-        for(int i = 0; i < mazeSizeX; i++)
-        {
-            if(maze[i][j] == 0)
-            {
-                cmaze[i][j] = 'H';
-            }
-            else if(maze[i][j] == 8)
-            {
-                cmaze[i][j] = '#';
-            }
-            else if(maze[i][j] == 4)
-            {
-                cmaze[i][j] = '~';
-            }
-            else if(maze[i][j] == 1)
-            {
-                cmaze[i][j] = '.';
-            }
-            else if(maze[i][j] == 5)
-            {
-                cmaze[i][j] = 'S';
-            }
-            else if(maze[i][j] == 9)
-            {
-                cmaze[i][j] = 'G';
-            }
-            cout << cmaze[i][j];
-            cout << " ";
-        }
-        cout << "\n";
-    }
-}
 
 
 bool add(test_2_service::path::Request  &req,
@@ -501,8 +539,8 @@ bool add(test_2_service::path::Request  &req,
     int start_pos[2] = {req.my_pos_x,req.my_pos_y};//<---my_pos
     int goal_pos[2] = {req.goal_pos_x,req.goal_pos_y};//<---goap  
 
-    ROS_INFO("%d \t %d ", goal_pos[0],goal_pos[1]);
-    PrintMaze(start_pos, goal_pos, maze);
+ //   ROS_INFO("%d \t %d ", goal_pos[0],goal_pos[1]);
+ //   PrintMaze(start_pos, goal_pos, maze);
 
     vector<PosNode> a = AStar(start_pos, goal_pos, maze);
     vector<PosNode> b = bresenhams_line_alg(a, maze);//--->output b
@@ -522,8 +560,6 @@ int main(int argc, char **argv)
     ros::init(argc, argv, "path_planning_01");
     ros::NodeHandle nh;
     ros::ServiceServer service = nh.advertiseService("add_two_ints_1", add);
-
-    ROS_INFO("Ready to add two ints 2.");
     ros::spin();
 
     return 0;
