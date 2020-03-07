@@ -7,11 +7,10 @@
 	</node>
 	<node pkg="test_2_service" type="talker2" name="talker2" output="screen">
 	</node>
-	<node pkg="test_2_service" type="agent_test" name="agent_test" output="screen">
+	<node pkg="test_2_service" type="agent_03" name="agent_03" output="screen">
 	</node>
 
 	<include file="$(find lidar_2020)/launch/lidar.launch" />
-	<include file="$(find test_2_service)/launch/service_test.launch" />
 
 
 

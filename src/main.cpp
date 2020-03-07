@@ -7,13 +7,15 @@
 #include <cstdlib>
 
 
+
+
 int main(int argc, char **argv)
 {
   ros::init(argc, argv, "main");
 
   ros::NodeHandle n;
   
-
+///  ros::Subscriber agent_sub = n.subscribe("")
   ros::ServiceClient client = n.serviceClient<test_2_service::path>("add_two_ints_1");
   test_2_service::path srv;
   srv.request.my_pos_x = 3 ;

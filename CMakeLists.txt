@@ -51,7 +51,6 @@ find_package(catkin REQUIRED COMPONENTS
 ## Generate messages in the 'msg' folder
 add_message_files(
   FILES
-  Ranging_alert.msg
   agent.msg
   camera_input.msg
   st1_input.msg
@@ -213,6 +212,9 @@ include_directories(
 
 add_executable(agent src/agent.cpp)
 target_link_libraries(agent ${catkin_LIBRARIES})
+
+add_executable(agent_test src/agent_test.cpp)
+target_link_libraries(agent_test ${catkin_LIBRARIES})
 
 
 add_executable(main src/main.cpp)
